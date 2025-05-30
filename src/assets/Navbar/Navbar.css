@@ -1,0 +1,12 @@
+.dropdown-toggle::after {
+  margin-left: 0.5em;
+  vertical-align: middle;
+}
+
+.dropdown-menu {
+  min-width: 200px;
+}
+
+#dropdown-user {
+  padding: 0.25rem 0.5rem;
+}

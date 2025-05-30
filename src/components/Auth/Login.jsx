@@ -1,44 +1,74 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import './Login.css';
 import Navbar from '../../assets/Navbar/Navbar';
+import Swal from 'sweetalert2';
 
 export default function TaskiLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
+
+  const from = location.state?.from?.pathname || '/dashboard';
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    
+    if (isLoading) return;
+    
+    if (!username.trim() || !password.trim()) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Information',
+        text: 'Please enter both username and password.',
+      });
+      return;
+    }
+
+    setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8000/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: username.trim(),
-          password: password.trim(),
-        }),
+      await login({ username: username.trim(), password: password.trim() });
+      
+      Swal.fire({
+        icon: 'success',
+        title: 'Login Successful',
+        showConfirmButton: false,
+        timer: 1500,
       });
 
-      const data = await response.json();
-      console.log('Login response:', data);
+      navigate(from, { replace: true });
 
-      if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
-      }
-
-      const token = data.token;
-
-      localStorage.setItem('authToken', token);
-
-      navigate('/Dashboard');
     } catch (error) {
-      console.error('Login error:', error.message);
-      alert(error.message || 'Login failed.');
+  let errorMessage = 'Something went wrong. Please try again.';
+  
+  if (
+    error.message?.toLowerCase().includes('invalid') ||
+    error.message?.toLowerCase().includes('unauthorized') ||
+    error.message?.toLowerCase().includes('wrong')
+  ) {
+    errorMessage = 'Username or password is incorrect. Please try again.';
+  }
+
+  Swal.fire({
+    icon: 'error',
+    title: 'Login Failed',
+    text: errorMessage,
+  });
+
+
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !isLoading) {
+      handleLogin(e);
     }
   };
 
@@ -59,7 +89,7 @@ export default function TaskiLogin() {
 
           <h1 className="login-title">Login</h1>
 
-          <div className="login-form">
+          <form className="login-form" onSubmit={handleLogin}>
             <div className="form-group">
               <label className="form-label">Username</label>
               <input
@@ -67,7 +97,11 @@ export default function TaskiLogin() {
                 className="form-input"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                onKeyPress={handleKeyPress}
                 placeholder="Enter your username"
+                disabled={isLoading}
+                autoComplete="username"
+                required
               />
             </div>
 
@@ -79,12 +113,17 @@ export default function TaskiLogin() {
                   className="form-input password-input"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  onKeyPress={handleKeyPress}
                   placeholder="••••••••••••"
+                  disabled={isLoading}
+                  autoComplete="current-password"
+                  required
                 />
                 <button
                   type="button"
                   className="password-toggle"
                   onClick={() => setShowPassword(!showPassword)}
+                  disabled={isLoading}
                 >
                   {showPassword ? (
                     <svg className="eye-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -121,10 +160,15 @@ export default function TaskiLogin() {
               </div>
             </div>
 
-            <button className="login-button" onClick={handleLogin}>
-              Login
-            </button>
-          </div>
+       <button 
+  type="submit" 
+  className="login-button"
+  disabled={isLoading}
+>
+  Login
+</button>
+
+          </form>
         </div>
       </div>
     </>
