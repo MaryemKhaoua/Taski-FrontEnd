@@ -1,7 +1,6 @@
 # Task Management Front End
 
-This is a Laravel-based RESTful API for a task management system with authentication, user roles, and task CRUD operations.
-
+A task management app with authentication, role-based access, and task CRUD operations
 ---
 
 ## 🚀 Setup Instructions
@@ -25,7 +24,6 @@ This is a Laravel-based RESTful API for a task management system with authentica
    ```
 
 ## 👥 Test Accounts
-The following test accounts are created automatically when you run php artisan db:seed:
 
 | Role   | Username        | Password            |
 |--------|-----------------|---------------------|
