@@ -11,8 +11,8 @@ export default function Home() {
           <div className="col-md-6 text-center text-md-start">
             <h1 className="display-4 text-primary fw-bold">Welcome to Taski</h1>
             <p className="lead mt-4">
-              Taski is your smart companion for organizing your day. Whether you're managing projects,
-              tracking daily goals, or just trying to remember your shopping list — Taski makes it effortless.
+              Taski is your smart companion for organizing your day. Whether you're managing projects or
+              tracking daily goals — Taski makes it effortless.
             </p>
             <p>
               Boost your productivity with our intuitive interface and powerful features like deadline reminders,
